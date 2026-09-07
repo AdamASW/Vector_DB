@@ -2,10 +2,33 @@
 Implementation of a Vector Database and search engine as a launch project in learning C++ from a solid experience with Python, Java, and C.
 
 ## Description
-
 This project is a high-performance vector search engine written in C++ with Python bindings. It is designed to store high-dimensional vectors, such as text embeddings, and retrieve the vectors most similar to a given query. The engine begins with an exact brute-force search implementation using cosine similarity before introducing persistent storage and a graph-based approximate nearest-neighbor index to improve search efficiency. C++ handles the core storage, similarity calculations, indexing, and search operations, while Python is used for generating embeddings and providing an accessible interface to the engine. The project includes benchmarking tools to evaluate the performance and accuracy tradeoffs between exact and approximate search approaches.
 
-## Future Extensions
+## Project Roadmap
+
+### Phase 1: Core Vector Database
+- Implement an initial `VectorDB` header and class in C++ with vector insertion, cosine similarity, and exact brute-force top-*k* search.
+
+### Phase 2: Python Integration and Deployment
+1. **Vectorization and Insertion:** Write a Python script that generates embeddings from text and inserts them into the C++ vector database.
+2. **Python–C++ Integration:** Use `pybind11` to expose the `VectorDB` class and its methods to Python.
+3. **Semantic Search:** Extend the Python application to vectorize queries and retrieve the most similar vectors from the database.
+4. **Testing:** Build a C++ testing suite covering insertion, search correctness, result ordering, invalid dimensions, edge cases, and error handling.
+5. **Containerization and Deployment:** Containerize the application with Docker and optionally expose the vector database through a FastAPI service.
+
+### Phase 3: Approximate Search
+- Implement a graph-based approximate nearest-neighbor index and progress toward a full HNSW implementation.
+- Benchmark the tradeoff between search latency and retrieval accuracy.
+
+### Phase 4: Optimization
+Explore performance improvements including:
+- SIMD similarity calculations
+- Multithreaded search
+- Optimized memory layouts
+- Vector quantization
+- Memory-mapped storage
+
+## Potential Future Extensions
 
 ### Containerized API Deployment: 
 Wrap the vector search engine in a FastAPI service and deploy it using Docker, exposing the engine through REST API endpoints.
