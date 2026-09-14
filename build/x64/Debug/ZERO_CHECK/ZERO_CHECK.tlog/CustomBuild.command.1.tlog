@@ -1,0 +1,10 @@
+^C:\USERS\ADAMF\VECTOR_DB\BUILD\CMAKEFILES\8AC10B57B33C914D8F0D9A50A1F473C7\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/adamf/Vector_DB -BC:/Users/adamf/Vector_DB/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/adamf/Vector_DB/build/VectorSearchEngine.slnx
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
