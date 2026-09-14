@@ -4,8 +4,9 @@
 #include <queue>
 #include <cmath>
 
-VectorDB::VectorDB(std::size_t dimension) {
+VectorDB::VectorDB(std::size_t dimension, VectorDBVariant variant) {
     dimension_ = dimension;
+    variant_ = variant;
 }
 
 void VectorDB::insert(int id, const std::vector<float>& vector) {

@@ -15,9 +15,17 @@ struct SearchResult {
     }
 };
 
+enum class VectorDBVariant {
+    Naive,
+    OptimizedVectors,
+    OptimizedSearch,
+    OptimizedVectorsAndSearch
+};
+
 class VectorDB {
 public:
-    explicit VectorDB(std::size_t dimension);
+    explicit VectorDB(std::size_t dimension,
+        VectorDBVariant variant = VectorDBVariant::Naive);
 
     void insert(int id, const std::vector<float>& vector);
 
@@ -31,6 +39,8 @@ public:
 
 private:
 
+    VectorDBVariant variant_;
+        
     std::size_t dimension_;
 
     std::unordered_map<int, std::vector<float>> vectors_;
