@@ -2,7 +2,7 @@
 Implementation of a Vector Database and search engine as a launch project in learning C++ from a solid experience with Python, Java, and C.
 
 ## Description
-This project is a high-performance vector search engine written in C++ with Python bindings. It is designed to store high-dimensional vectors, such as text embeddings, and retrieve the vectors most similar to a given query. The engine begins with an exact brute-force search implementation using cosine similarity before introducing persistent storage and a graph-based approximate nearest-neighbor index to improve search efficiency. C++ handles the core storage, similarity calculations, indexing, and search operations, while Python is used for generating embeddings and providing an accessible interface to the engine. The project includes benchmarking tools to evaluate the performance and accuracy tradeoffs between exact and approximate search approaches.
+This project is a high-performance vector search engine written in C++ with Python bindings. It is designed to store high-dimensional vectors, such as text embeddings, and retrieve the vectors most similar to a given query. The engine begins with an exact brute-force search implementation using cosine similarity before introducing persistent storage and a graph-based approximate nearest-neighbor index to improve search efficiency. C++ handles the core storage, similarity calculations, indexing, and search operations, while Python is used for generating embeddings and providing an accessible interface to the engine. The project includes benchmarking tools to evaluate the performance and accuracy tradeoffs between exact and approximate search approaches. Expansions include RAG retrieval agent, training or fine-tuning an embedding model, or Graph ML, all of which supported by the underlying Vector DB implementation.
 
 ## Project Roadmap
 
@@ -28,41 +28,96 @@ Explore performance improvements including:
 - Vector quantization
 - Memory-mapped storage
 
-## Potential Future Extensions
+## After HSNW Algorithm and Persistent Storage implementations:
 
-### Containerized API Deployment: 
-Wrap the vector search engine in a FastAPI service and deploy it using Docker, exposing the engine through REST API endpoints.
+The following expansions will extend the project from a vector-search engine into a broader AI/ML retrieval platform.
 
-### Running the API-backed AG News notebook
-Build the Linux image and start the Dockerized API service:
+### A. Retrieval-Augmented Generation and Agentic Search
 
-```powershell
-docker build -t vector-db .
-docker run --rm --name vector-db-api -p 8000:8000 vector-db
-```
+Build an application that uses the vector database as the retrieval layer for an LLM-powered system.
 
-With the service running, open `python/semantic_search.ipynb` and run the cells in order. The notebook keeps the local C++/Python mode separate from the HTTP API mode. The API section starts with a 20-row AG News validation subset, inserts embeddings through batched `POST /vectors` requests, and queries them through `POST /search`. Set `API_DATASET_LIMIT = None` only after the subset validation succeeds to use all loaded rows.
+Potential projects include:
 
-### RAG System with LangChain: 
-Integrate the engine with LangChain and use it as the retrieval backend for a Retrieval-Augmented Generation pipeline.
+- ITSM troubleshooting assistant using incident, change, and knowledge-base data.
+- Research-paper assistant with semantic search and citation-aware responses.
+- Codebase documentation assistant.
+- Personal knowledge-base assistant.
 
-### Hybrid Search: 
-Combine vector similarity search with traditional keyword search, such as BM25, to improve retrieval for queries where exact terms are important.
+Potential features:
 
-### Similarity Algorithm Optimization:
-Optimize similarity calculations by exploring improved memory layouts and SIMD instructions such as AVX and AVX2.
+- Document ingestion and chunking.
+- Metadata filtering.
+- Hybrid keyword and embedding search.
+- Query rewriting.
+- Result reranking.
+- Retrieval evaluation using Recall@k, MRR, and nDCG.
+- LLM tool calling.
+- Conversation memory.
+- Multi-step agentic retrieval workflows.
 
-### Parallel Search:
-Parallelize similarity calculations across multiple CPU cores and benchmark how multithreading affects search latency at different dataset sizes.
+The goal is to evaluate whether improved retrieval quality produces better downstream LLM responses.
 
-### Full HNSW Implementation: 
-Expand the simplified graph-based approximate nearest-neighbor index into a complete Hierarchical Navigable Small World implementation with configurable search and construction parameters.
+### B. Fine-Tuned Embedding Models
 
-### Advanced Metadata Filtering: 
-Implement structured metadata filtering and secondary indexes to efficiently combine traditional database queries with vector similarity search.
+Investigate whether a domain-specific embedding model improves retrieval performance compared with general-purpose embedding models.
 
-### Vector Quantization: 
-Explore lower-precision vector representations, such as float16 and int8, to reduce memory usage while measuring the resulting impact on retrieval accuracy.
+Potential work:
 
-### Memory-Mapped Storage: 
-Use memory-mapped files to support vector datasets larger than available RAM and explore the performance tradeoffs of disk-backed storage.
+- Compare multiple pretrained embedding models.
+- Create labeled query-document relevance pairs.
+- Build a contrastive-learning dataset.
+- Fine-tune a bi-encoder embedding model.
+- Compare pretrained and fine-tuned embeddings.
+- Index both representations in the vector database.
+- Evaluate Recall@k, MRR, nDCG, latency, and storage requirements.
+
+This would connect the C++ retrieval infrastructure with practical machine-learning model development.
+
+### C. Graph Machine Learning and Graph-Enhanced Retrieval
+
+Extend the vector database with graph-based representations of entities and relationships.
+
+Potential projects include:
+
+- Incident-to-incident similarity graphs.
+- Knowledge graphs for ITSM troubleshooting.
+- Research-paper citation or concept graphs.
+- Graph-based recommendation systems.
+- Entity relationship discovery.
+
+Potential techniques:
+
+- Node2Vec or other graph-embedding methods.
+- Graph neural networks.
+- Node classification.
+- Link prediction.
+- Community detection.
+- Graph-enhanced retrieval.
+- Combining graph traversal with vector similarity search.
+
+The goal is to investigate whether structural relationships can improve retrieval beyond embedding similarity alone.
+
+### D. Learned Retrieval and Reranking
+
+Build a multi-stage retrieval pipeline in which the vector database retrieves candidates and a learned model determines their final ranking.
+
+Example pipeline:
+
+Query  
+→ Embedding model  
+→ VectorDB candidate retrieval  
+→ Candidate filtering  
+→ Learned reranker  
+→ Final ranked results
+
+Potential work:
+
+- Generate query-document relevance labels.
+- Retrieve an initial candidate set using HNSW.
+- Train a cross-encoder or other relevance model.
+- Compare heuristic ranking against learned reranking.
+- Study the tradeoff between retrieval recall, ranking quality, and latency.
+- Experiment with query expansion and metadata-aware ranking.
+- Evaluate the complete pipeline using Recall@k, MRR, nDCG, and end-to-end response quality.
+
+This would move the project from approximate nearest-neighbor search toward a complete, evaluated information-retrieval system.
