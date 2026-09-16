@@ -55,6 +55,11 @@ FROM runtime AS test
 
 COPY requirements-dev.txt .
 RUN python -m pip install -r requirements-dev.txt
+RUN mkdir -p build/Debug \
+    && cp build/Release/_vector_db*.so build/Debug/
 COPY tests ./tests
 
 CMD ["python", "-m", "pytest", "tests", "-q"]
+
+
+FROM runtime AS production

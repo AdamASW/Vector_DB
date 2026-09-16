@@ -33,6 +33,16 @@ Explore performance improvements including:
 ### Containerized API Deployment: 
 Wrap the vector search engine in a FastAPI service and deploy it using Docker, exposing the engine through REST API endpoints.
 
+### Running the API-backed AG News notebook
+Build the Linux image and start the Dockerized API service:
+
+```powershell
+docker build -t vector-db .
+docker run --rm --name vector-db-api -p 8000:8000 vector-db
+```
+
+With the service running, open `python/semantic_search.ipynb` and run the cells in order. The notebook keeps the local C++/Python mode separate from the HTTP API mode. The API section starts with a 20-row AG News validation subset, inserts embeddings through batched `POST /vectors` requests, and queries them through `POST /search`. Set `API_DATASET_LIMIT = None` only after the subset validation succeeds to use all loaded rows.
+
 ### RAG System with LangChain: 
 Integrate the engine with LangChain and use it as the retrieval backend for a Retrieval-Augmented Generation pipeline.
 
