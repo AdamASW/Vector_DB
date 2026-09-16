@@ -18,6 +18,10 @@ void VectorDB::insert(int id, const std::vector<float>& vector) {
     vectors_[id] = vector;
 }
 
+std::size_t VectorDB::size() const {
+    return vectors_.size();
+}
+
 std::vector<SearchResult> VectorDB::search(const std::vector<float>& query_vector, std::size_t top_k) const {
     // Edge case top_k = 0:
     if (top_k == 0) {

@@ -37,9 +37,13 @@ def test_import_and_basic_search():
 def test_wrapped_import_and_basic_search():
     db = VectorSearchDB(dimension=3)
 
+    assert db.size() == 0
+
     db.insert(1, [1.0, 0.0, 0.0])
     db.insert(2, [0.0, 1.0, 0.0])
     db.insert(3, [0.9, 0.1, 0.0])
+
+    assert db.size() == 3
 
     results = db.search([1.0, 0.0, 0.0], 2)
 

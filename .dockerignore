@@ -1,0 +1,17 @@
+.git
+.gitignore
+.pytest_cache
+__pycache__
+*.pyc
+
+build
+build-portability
+
+.vscode
+.idea
+
+*.ipynb
+command_notes.txt
+
+Dockerfile
+.dockerignore

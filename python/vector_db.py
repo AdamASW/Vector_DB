@@ -1,8 +1,21 @@
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+BUILD_DIR = PROJECT_ROOT / "build" / "Release"
+
+sys.path.insert(0, str(BUILD_DIR))
+
 from _vector_db import VectorDB as _CppVectorDB
 
 class VectorSearchDB:
     def __init__(self, dimension: int):
         self._db = _CppVectorDB(dimension)
+        self._dimension = dimension
+
+    @property
+    def dimension(self):
+        return self._dimension
 
     def insert(self, vector_id: int, vector):
         vector = [float(value) for value in vector]
@@ -20,3 +33,6 @@ class VectorSearchDB:
             }
             for result in results
         ]
+
+    def size(self):
+        return self._db.size() # Need to implement.

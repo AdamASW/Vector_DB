@@ -32,5 +32,9 @@ PYBIND11_MODULE(_vector_db, m) {
             &VectorDB::search,
             py::arg("query_vector"),
             py::arg("top_k")
+        )
+        .def(
+            "size",
+            &VectorDB::size
         );
 }
