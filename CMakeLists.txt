@@ -23,6 +23,7 @@ find_package(pybind11 CONFIG REQUIRED)
 pybind11_add_module(
     _vector_db
     bindings/bindings.cpp
+    src/Vector.cpp
     src/VectorDB.cpp
 )
 

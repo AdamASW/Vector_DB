@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "Vector.hpp"
+
 using namespace std;
 
 struct SearchResult {
@@ -43,10 +45,5 @@ private:
         
     std::size_t dimension_;
 
-    std::unordered_map<int, std::vector<float>> vectors_;
-
-    float cosine_similarity(
-        const std::vector<float>& a, 
-        const std::vector<float>& b) 
-        const;
+    std::unordered_map<int, Vector> vectors_;
 };

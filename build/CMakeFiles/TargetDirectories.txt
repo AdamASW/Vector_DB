@@ -1,3 +1,0 @@
-C:/Users/adamf/Vector_DB/build/CMakeFiles/_vector_db.dir
-C:/Users/adamf/Vector_DB/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/adamf/Vector_DB/build/CMakeFiles/ZERO_CHECK.dir

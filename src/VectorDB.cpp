@@ -1,8 +1,7 @@
 #include "VectorDB.hpp"
 #include <algorithm>
-#include <stdexcept>
 #include <queue>
-#include <cmath>
+#include <stdexcept>
 
 VectorDB::VectorDB(std::size_t dimension, VectorDBVariant variant) {
     dimension_ = dimension;
@@ -15,7 +14,7 @@ void VectorDB::insert(int id, const std::vector<float>& vector) {
         "Inserted vector must have the same dimension as the vector database."
         );
     }
-    vectors_[id] = vector;
+    vectors_.insert_or_assign(id, Vector(vector));
 }
 
 std::size_t VectorDB::size() const {
@@ -27,14 +26,15 @@ std::vector<SearchResult> VectorDB::search(const std::vector<float>& query_vecto
     if (top_k == 0) {
         throw std::invalid_argument("Cannot return a vector of 0 results. Please specify a positive, non-zero top_k");
     }
-    if (query_vector.size() != dimension_) {
+    Vector query(query_vector);
+    if (query.dimension() != dimension_) {
         throw std::invalid_argument("Vector query_vector must have same dimension as the vector database.");
     }
     // Define min heap structure.
     std::priority_queue<SearchResult, std::vector<SearchResult>, std::greater<>> search_results;
     // Iterate through all vectors in the database, compute cosine similarity, and store top_k results in priority queue.
     for (const auto& [id, vector] : vectors_) {
-        float score = cosine_similarity(vector, query_vector);
+        float score = vector.cosine_similarity(query_vector);
         SearchResult curr_result{id, score};
         if (search_results.size() >= top_k) { // should never be >
             float worst_score = search_results.top().score;
@@ -51,28 +51,4 @@ std::vector<SearchResult> VectorDB::search(const std::vector<float>& query_vecto
         search_results.pop();
     }
     return results;
-}
-
-float VectorDB::cosine_similarity(const std::vector<float>& a, const std::vector<float>& b) const {
-    // Verify same dimension:
-    std::size_t n = a.size();
-    if (n != b.size()) {
-        throw std::invalid_argument("Cannot compute the cosine similarity of vectors with different sizes.");
-    }
-    // (A \dot B) / (||A|| * ||B||)
-    float dot_prod = 0, mag_a = 0, mag_b = 0;
-    for (std::size_t i = 0; i < n; i++) {
-        float elem_a = a[i], elem_b = b[i];
-        dot_prod += (elem_a * elem_b);
-        mag_a += elem_a*elem_a;
-        mag_b += elem_b*elem_b;
-    }
-    mag_a = std::sqrt(mag_a);
-    mag_b = std::sqrt(mag_b);
-    float denom = mag_a * mag_b;
-    if (denom == 0) {
-        throw std::domain_error("Either of the vectors have a magnitude of 0, making cosine similarity invalid.");
-    }
-    float cosine_sim = dot_prod/denom;
-    return cosine_sim;
 }
