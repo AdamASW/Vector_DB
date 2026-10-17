@@ -3,6 +3,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <utility>
+#include <vector>
 
 Vector::Vector(std::vector<float> values)
 	: values_(std::move(values)) {}

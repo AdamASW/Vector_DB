@@ -13,6 +13,10 @@ class Vector {
 
         float cosine_similarity(std::vector<float> values) const;
 
+        const std::vector<float>& values() const noexcept {
+            return values_;
+        }
+
     private:
         std::vector<float> values_;
 
