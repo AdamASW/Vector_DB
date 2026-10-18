@@ -14,7 +14,73 @@ public:
         entry_point_(-1),
         max_level_(-1),
         rng_(std::random_device{}()) {}
-          
+
+    void insert(int id, const Vector& vector) {
+        // Initialize the new node in the graph:
+        int level = random_level();
+        this->max_level_ = max(level,this->max_level_);
+        std::vector<std::vector<int>> new_neighbors(this->max_level_, std::vector<int>());
+        Node new_node{id, vector, new_neighbors};
+
+        // Deal with empty graph:
+        if (graph_.empty()) { 
+            entry_point_ = id;
+            graph_.at(id) = new_node;
+            return;
+        }
+
+        // If graph non-empty, start search for upper layers, if applicable:
+        int k = 0;
+        int entry_node = entry_point_;
+        while ((level + k) < max_level_) {
+            entry_node = greedy_search(vector, entry_node, (max_level_ - k));
+            k++;
+        }
+
+        // Now process lower layers:
+        for (int l = level; l >= 0; l--) {
+            auto new_candidates = search_layer(vector, entry_node, ef_construction, l);
+            auto new_neighbors = select_neighbors(vector, new_candidates, max_neighbors);
+
+            int M = max_neighbors;
+            for (auto it = new_neighbors.begin(); it != new_neighbors.end(); ) {
+                if (l == 0) M *= 2;
+                graph_.at(*it).neighbors[l].push_back(new_node.id);
+                graph_.at(*it).neighbors[l] = select_neighbors(graph_.at(*it).vector,
+                    graph_.at(*it).neighbors[l], M);
+                auto neighbors_neighbors = graph_.at(*it).neighbors[l];
+                if (std::find(neighbors_neighbors.begin(), neighbors_neighbors.end(),
+                    new_node.id) == neighbors_neighbors.end()) {
+                    it = new_neighbors.erase(it);
+                } else {
+                    ++it;
+                }
+            }
+            if (!new_neighbors.empty()) entry_node = new_neighbors.front();
+        }
+    }
+
+    std::vector<SearchResult> search(const Vector& query, std::size_t top_k,
+            std::size_t ef_search) const {
+        int entry_node = entry_point_;
+        for (int l = max_level_; l > 0; l--) {
+            entry_node = greedy_search(query, entry_node, l);
+        }
+        auto result = search_layer(query, entry_node, ef_search, 0);
+        top_k = min(top_k, result.size());
+        // search_layer() returns in least to greatest order.
+        result.erase(result.begin(), result.end() - top_k);
+
+        std::vector<SearchResult> topk_result;
+        for (auto it = result.rbegin(); it != result.rend(); ++it) {
+            int r = *it;
+            SearchResult curr_r{r, query.cosine_similarity(graph_.at(r).vector.values())};
+            topk_result.push_back(curr_r);
+        }
+
+        // Return a vector of SearchResult objects in greatest to least similarity score.
+        return topk_result;
+    }
 
 private:
     std::size_t max_neighbors;
@@ -122,7 +188,7 @@ private:
             dist(rng_) < 1.0f / max_neighbors) {
             ++level;
         }
-        
+
         return level;
     }
 };

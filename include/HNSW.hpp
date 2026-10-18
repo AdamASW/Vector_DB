@@ -11,9 +11,7 @@ class HNSWIndex {
 
         void insert(int id, const Vector& vector);
 
-        std::vector<SearchResult> search(
-            const Vector& query,
-            std::size_t top_k,
+        std::vector<SearchResult> search(const Vector& query, std::size_t top_k,
             std::size_t ef_search) const;
 
     private:
