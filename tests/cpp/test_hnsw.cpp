@@ -94,6 +94,20 @@ void test_large_top_k_and_small_ef() {
     check(!low_ef_results.empty(), "ef_search of one still returns a candidate");
     check(low_ef_results.size() <= 5, "small ef search respects top_k");
 }
+
+void test_high_ef_reaches_all_inserted_nodes() {
+    constexpr int vector_count = 64;
+    constexpr float pi = 3.14159265358979323846f;
+    HNSWIndex index(8, vector_count);
+    for (int id = 0; id < vector_count; ++id) {
+        const float angle = 2.0f * pi * id / vector_count;
+        index.insert(id, Vector({std::cos(angle), std::sin(angle)}));
+    }
+
+    const auto results = index.search(Vector({1.0f, 0.0f}), vector_count, vector_count);
+    check(results.size() == vector_count,
+        "high ef search can reach every node in a connected inserted graph");
+}
 }
 
 int main() {
@@ -101,5 +115,6 @@ int main() {
     test_single_vector_and_query_edges();
     test_insert_search_order_and_scores();
     test_large_top_k_and_small_ef();
+    test_high_ef_reaches_all_inserted_nodes();
     return failures == 0 ? 0 : 1;
 }

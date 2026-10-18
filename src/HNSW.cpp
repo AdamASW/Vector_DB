@@ -79,7 +79,7 @@ void HNSWIndex::insert(int id, const Vector& vector) {
             entry_point_ = id;
             max_level_ = level;
         }
-    }
+}
 
     std::vector<SearchResult> HNSWIndex::search(const Vector& query, std::size_t top_k,
         std::size_t ef_search) const {
@@ -132,41 +132,48 @@ int HNSWIndex::greedy_search(const Vector& query, int entry_point, int layer) co
 
 vector<int> HNSWIndex::search_layer(const Vector& query, int entry_point, size_t ef,
         int layer) const {
+        using Candidate = pair<float, int>;
         unordered_set<int> visited;
-    priority_queue<pair<float,int>, vector<pair<float,int>>, greater<pair<float,int>>> pq;
-        queue<int> q;
-    ef = max<std::size_t>(ef, 1);
+        priority_queue<Candidate> candidates;
+        priority_queue<Candidate, vector<Candidate>, greater<Candidate>> best;
+        ef = max<std::size_t>(ef, 1);
 
-    float current_sim = query.cosine_similarity(graph_.at(entry_point).vector.values());
-        pq.push({current_sim, entry_point});
-        q.push(entry_point);
+        float entry_similarity = query.cosine_similarity(
+            graph_.at(entry_point).vector.values());
+        candidates.push({entry_similarity, entry_point});
+        best.push({entry_similarity, entry_point});
         visited.insert(entry_point);
 
-        while (!q.empty()) {
-            int curr_node = q.front();
-            q.pop();
+        while (!candidates.empty()) {
+            Candidate current = candidates.top();
+            if (best.size() >= ef && current.first < best.top().first) {
+                break;
+            }
+            candidates.pop();
 
-            if (layer < 0 || static_cast<std::size_t>(layer) >= graph_.at(curr_node).neighbors.size()) {
+            if (layer < 0 || static_cast<std::size_t>(layer) >=
+                graph_.at(current.second).neighbors.size()) {
                 continue;
             }
-            for (int neighbor : graph_.at(curr_node).neighbors[layer]) {
-                if (visited.count(neighbor)) { continue; }
-                visited.insert(neighbor);
-                q.push(neighbor);
-                float neighbor_sim = query.cosine_similarity(graph_.at(neighbor).vector.values());
-                if (pq.size() < ef || neighbor_sim > pq.top().first) {
-                    pq.push({neighbor_sim, neighbor});
-                    if (pq.size() > ef) pq.pop();
-                    q.push(neighbor);
+            for (int neighbor : graph_.at(current.second).neighbors[layer]) {
+                if (!visited.insert(neighbor).second) { continue; }
+                float neighbor_similarity = query.cosine_similarity(
+                    graph_.at(neighbor).vector.values());
+                if (best.size() < ef || neighbor_similarity > best.top().first) {
+                    Candidate candidate{neighbor_similarity, neighbor};
+                    candidates.push(candidate);
+                    best.push(candidate);
+                    if (best.size() > ef) {
+                        best.pop();
+                    }
                 }
             }
         }
-                
+
         vector<int> result_candidates;
-        while (!pq.empty()) {
-            auto [cand_sim, cand_idx] = pq.top();
-            pq.pop();
-            result_candidates.push_back(cand_idx);
+        while (!best.empty()) {
+            result_candidates.push_back(best.top().second);
+            best.pop();
         }
         return result_candidates;
     }
@@ -177,11 +184,11 @@ vector<int> HNSWIndex::search_layer(const Vector& query, int entry_point, size_t
         // Candidates explored in greatest -> least similarity to query, since they're returned in
         // least -> greatest order by search_layer().
         for (auto it = candidates.rbegin(); it != candidates.rend(); ++it) {
-            int cq_distance = (1 - query.cosine_similarity(graph_.at(*it).vector.values()));
+            float cq_distance = (1 - query.cosine_similarity(graph_.at(*it).vector.values()));
 
             bool diverse = true;
             for (int s : selected) {
-                int cs_distance = (1 - graph_.at(*it).vector.cosine_similarity(
+                float cs_distance = (1 - graph_.at(*it).vector.cosine_similarity(
                     graph_.at(s).vector.values()));
                 if (cq_distance >= cs_distance) {
                     diverse = false;

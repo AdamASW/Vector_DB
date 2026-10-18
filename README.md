@@ -1,6 +1,8 @@
 # Vector_DB
 Implementation of a Vector Database and search engine as a launch project in learning C++ from a solid experience with Python, Java, and C.
 
+**Current milestone: HNSW implementation completed and tested.** The C++ HNSW index is integrated with `VectorDB` and compared with exact naive search using held-out queries.
+
 ## Description
 This project is a high-performance vector search engine written in C++ with Python bindings. It is designed to store high-dimensional vectors, such as text embeddings, and retrieve the vectors most similar to a given query. The engine begins with an exact brute-force search implementation using cosine similarity before introducing persistent storage and a graph-based approximate nearest-neighbor index to improve search efficiency. C++ handles the core storage, similarity calculations, indexing, and search operations, while Python is used for generating embeddings and providing an accessible interface to the engine. The project includes benchmarking tools to evaluate the performance and accuracy tradeoffs between exact and approximate search approaches. Expansions include RAG retrieval agent, training or fine-tuning an embedding model, or Graph ML, all of which supported by the underlying Vector DB implementation.
 
@@ -17,8 +19,19 @@ This project is a high-performance vector search engine written in C++ with Pyth
 5. **Containerization and Deployment:** Containerize the application with Docker and optionally expose the vector database through a FastAPI service.
 
 ### Phase 3: Approximate Search
-- Implement a graph-based approximate nearest-neighbor index and progress toward a full HNSW implementation.
-- Benchmark the tradeoff between search latency and retrieval accuracy.
+- [x] Implement a graph-based approximate nearest-neighbor index using HNSW.
+- [x] Benchmark the tradeoff between search latency and retrieval accuracy.
+
+#### HNSW Benchmark
+
+Measured on 15,000 training vectors and 1,000 held-out queries at 384 dimensions, with `k = 10`:
+
+| Backend | Insert time | Total search time | Mean query time | Recall@10 | Mean top-k cosine |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Naive (exact) | 0.664 s | 32.579 s | 32.579 ms | 1.000 | 0.5926 |
+| HNSW | 113.077 s | 1.668 s | 1.668 ms | 0.986 | 0.5922 |
+
+HNSW achieved about 19.5x faster queries with 98.6% Recall@10, at the cost of a substantially longer index build. The naive backend provides the exact top-k reference for recall.
 
 ### Phase 4: Optimization
 Explore performance improvements including:
