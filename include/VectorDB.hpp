@@ -4,24 +4,18 @@
 #include <unordered_map>
 #include <vector>
 
+#include "HNSW.hpp"
+#include "SearchResult.hpp"
 #include "Vector.hpp"
 
 using namespace std;
-
-struct SearchResult {
-    int id;
-    float score;
-
-    bool operator>(const SearchResult& other) const {
-        return score > other.score;
-    }
-};
 
 enum class VectorDBVariant {
     Naive,
     OptimizedVectors,
     OptimizedSearch,
-    OptimizedVectorsAndSearch
+    OptimizedVectorsAndSearch,
+    HNSW
 };
 
 class VectorDB {
@@ -42,6 +36,8 @@ public:
 private:
 
     VectorDBVariant variant_;
+
+    HNSWIndex hnsw_;
         
     std::size_t dimension_;
 

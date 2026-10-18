@@ -3,16 +3,17 @@
 #include <queue>
 #include <stdexcept>
 
-VectorDB::VectorDB(std::size_t dimension, VectorDBVariant variant) {
-    dimension_ = dimension;
-    variant_ = variant;
-}
+VectorDB::VectorDB(std::size_t dimension, VectorDBVariant variant)
+    : variant_(variant), hnsw_(16, 200), dimension_(dimension) {}
 
 void VectorDB::insert(int id, const std::vector<float>& vector) {
     if (vector.size() != dimension_) {
         throw std::invalid_argument(
         "Inserted vector must have the same dimension as the vector database."
         );
+    }
+    if (variant_ == VectorDBVariant::HNSW) {
+        hnsw_.insert(id, Vector(vector));
     }
     vectors_.insert_or_assign(id, Vector(vector));
 }
@@ -29,6 +30,9 @@ std::vector<SearchResult> VectorDB::search(const std::vector<float>& query_vecto
     Vector query(query_vector);
     if (query.dimension() != dimension_) {
         throw std::invalid_argument("Vector query_vector must have same dimension as the vector database.");
+    }
+    if (variant_ == VectorDBVariant::HNSW && !vectors_.empty()) {
+        return hnsw_.search(query, top_k, std::max<std::size_t>(top_k, 64));
     }
     // Define min heap structure.
     std::priority_queue<SearchResult, std::vector<SearchResult>, std::greater<>> search_results;

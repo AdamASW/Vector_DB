@@ -23,6 +23,7 @@ find_package(pybind11 CONFIG REQUIRED)
 pybind11_add_module(
     _vector_db
     bindings/bindings.cpp
+    src/HNSW.cpp
     src/Vector.cpp
     src/VectorDB.cpp
 )
@@ -32,3 +33,14 @@ target_include_directories(
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+include(CTest)
+if(BUILD_TESTING)
+    add_executable(test_hnsw
+        tests/cpp/test_hnsw.cpp
+        src/HNSW.cpp
+        src/Vector.cpp
+    )
+    target_include_directories(test_hnsw PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    add_test(NAME hnsw_behavior COMMAND test_hnsw)
+endif()

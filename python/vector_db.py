@@ -7,10 +7,11 @@ BUILD_DIR = PROJECT_ROOT / "build" / "Release"
 sys.path.insert(0, str(BUILD_DIR))
 
 from _vector_db import VectorDB as _CppVectorDB
+from _vector_db import VectorDBVariant
 
 class VectorSearchDB:
-    def __init__(self, dimension: int):
-        self._db = _CppVectorDB(dimension)
+    def __init__(self, dimension: int, variant=VectorDBVariant.Naive):
+        self._db = _CppVectorDB(dimension, variant)
         self._dimension = dimension
 
     @property
